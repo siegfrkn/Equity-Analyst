@@ -394,7 +394,7 @@ DATASETS.schwab = {
     '"Reliable platform with deep research tools." - Investor',
     '"Interface could be more modern." - Retail client'
   ],
-  forecast: defaultDataset.forecast,
+  forecast: DATASETS.nvidia.forecast,
   valuation: {
     dcf: '$120B',
     share: '$78.40',
@@ -433,7 +433,7 @@ DATASETS.amazon = {
     '"Prime delivery is unmatched." - Consumer',
     '"Marketplace fees are rising." - Seller'
   ],
-  forecast: defaultDataset.forecast,
+  forecast: DATASETS.nvidia.forecast,
   valuation: {
     dcf: '$2.05T',
     share: '$194.20',
@@ -472,7 +472,7 @@ DATASETS.meta = {
     '"Best ROI among major platforms." - Advertiser',
     '"Engagement is strong, but content moderation is uneven." - Analyst'
   ],
-  forecast: defaultDataset.forecast,
+  forecast: DATASETS.nvidia.forecast,
   valuation: {
     dcf: '$1.42T',
     share: '$515.30',
@@ -713,7 +713,7 @@ const createGenericDataset = (name) => ({
     '"Strong support and onboarding." - Buyer feedback'
   ],
   filings: [],
-  forecast: defaultDataset.forecast,
+  forecast: DATASETS.nvidia.forecast,
   modelDrivers: [
     'Revenue growth 5-8% with stable pricing',
     'Margins expand 100-200 bps from operating leverage',
