@@ -891,8 +891,22 @@ quickPicks.forEach((button) => {
 });
 
 const createCsv = (dataset) => {
-  const rows = [['Year', 'Revenue', 'EBITDA', 'FCF', 'Margin']];
+  const rows = [
+    ['Company', dataset.name],
+    ['Market Cap', dataset.marketCap],
+    ['Revenue (TTM)', dataset.revenue],
+    ['Gross Margin', dataset.grossMargin],
+    [''],
+    ['5-Year Forecast'],
+    ['Year', 'Revenue ($B)', 'EBITDA ($B)', 'FCF ($B)', 'Margin', 'Notes']
+  ];
   dataset.forecast.base.forEach((row) => rows.push(row));
+  rows.push(['']);
+  rows.push(['Valuation Summary']);
+  rows.push(['DCF Value', dataset.valuation.dcf]);
+  rows.push(['Implied Share Price', dataset.valuation.share]);
+  rows.push(['EV/EBITDA vs Peers', dataset.valuation.ev]);
+  rows.push(['Customer-Based Value', dataset.valuation.cbc]);
   return rows.map((row) => row.join(',')).join('\n');
 };
 
@@ -905,10 +919,17 @@ const downloadFile = (content, filename, type) => {
   URL.revokeObjectURL(link.href);
 };
 
+const getFilenameBase = () => {
+  // Extract ticker symbol from name like "NVIDIA Corporation (NVDA)" -> "NVDA"
+  const match = currentDataset.name.match(/\(([A-Z]+)\)/);
+  return match ? match[1].toLowerCase() : 'company';
+};
+
 const exportExcelFile = () => {
   const csv = createCsv(currentDataset);
-  downloadFile(csv, 'xyz-company-model.csv', 'text/csv');
-  showToast('Excel model downloaded (CSV)');
+  const filename = `${getFilenameBase()}-model.csv`;
+  downloadFile(csv, filename, 'text/csv');
+  showToast(`Excel model downloaded: ${filename}`);
 };
 
 const exportDeckFile = () => {
@@ -925,8 +946,9 @@ const exportDeckFile = () => {
     slide2.addText(`Share Price: ${currentDataset.valuation.share}`, { x: 0.8, y: 2.1, w: 6, h: 0.5, fontSize: 18, color: 'E6C08A' });
     slide2.addText(`Peer Multiple: ${currentDataset.valuation.ev}`, { x: 0.8, y: 2.8, w: 6, h: 0.5, fontSize: 18, color: 'E6C08A' });
     slide2.addText(`Customer-based value: ${currentDataset.valuation.cbc}`, { x: 0.8, y: 3.5, w: 8, h: 0.5, fontSize: 18, color: 'E6C08A' });
-    pptx.writeFile({ fileName: 'xyz-company-deck.pptx' });
-    showToast('Deck downloaded (.pptx)');
+    const filename = `${getFilenameBase()}-deck.pptx`;
+    pptx.writeFile({ fileName: filename });
+    showToast(`Deck downloaded: ${filename}`);
     return;
   }
 
@@ -981,8 +1003,9 @@ const exportDeckFile = () => {
     </section>
   </body>
 </html>`;
-  downloadFile(deck, 'xyz-company-deck.html', 'text/html');
-  showToast('Deck downloaded (HTML)');
+  const filename = `${getFilenameBase()}-deck.html`;
+  downloadFile(deck, filename, 'text/html');
+  showToast(`Deck downloaded: ${filename}`);
 };
 
 const openExportModal = () => exportModal.classList.add('open');
