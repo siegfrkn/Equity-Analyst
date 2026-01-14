@@ -1035,25 +1035,58 @@ const scrollToSection = (id) => {
 };
 
 const runBlkDemo = () => {
-  companyInput.value = 'BLK';
-  showToast('Running BlackRock demo');
-  if (analysisStatus) analysisStatus.textContent = 'Demo running...';
-  if (dataStatus) dataStatus.innerHTML = 'Live data: <strong>simulated public data</strong>';
-  simulateTimelineFlow();
-  applyDataset(resolveDataset('BLK'));
+  // Use NVIDIA for more impressive demo data (high growth, large market cap)
+  const demoCompany = 'NVDA';
+  companyInput.value = demoCompany;
 
-  setTimeout(() => scrollToSection('report'), 1200);
-  setTimeout(() => scrollToSection('model'), 2400);
-  setTimeout(() => scrollToSection('export'), 3600);
-  setTimeout(() => openExportModal(), 4400);
+  // Show loading state briefly
+  if (analysisStatus) analysisStatus.textContent = 'Analyzing...';
+  if (dataStatus) dataStatus.textContent = 'Live data: connecting...';
+
+  // Disable button during load
+  if (runDemo) {
+    runDemo.disabled = true;
+    runDemo.textContent = 'Loading...';
+  }
+
+  // Animate timeline
+  simulateTimelineFlow();
+
+  // Add visual fade-in effect to sections
+  const sections = document.querySelectorAll('.report, .model, .export');
+  sections.forEach(section => {
+    section.style.opacity = '0';
+    section.style.transform = 'translateY(20px)';
+    section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  });
+
+  // Apply data after brief delay for effect
   setTimeout(() => {
-    closeExportModal();
-    openPdfModal();
-  }, 6000);
-  setTimeout(() => {
-    closePdfModal();
-    if (analysisStatus) analysisStatus.textContent = 'Demo complete.';
-  }, 8000);
+    applyDataset(resolveDataset(demoCompany));
+
+    // Reveal sections with staggered animation
+    sections.forEach((section, index) => {
+      setTimeout(() => {
+        section.style.opacity = '1';
+        section.style.transform = 'translateY(0)';
+      }, index * 150);
+    });
+
+    // Update status
+    if (analysisStatus) analysisStatus.textContent = 'Analysis complete';
+    if (dataStatus) dataStatus.textContent = 'Live data: simulated (demo mode)';
+
+    // Re-enable button
+    if (runDemo) {
+      runDemo.disabled = false;
+      runDemo.textContent = 'Play demo';
+    }
+
+    // Scroll to report section smoothly
+    setTimeout(() => scrollToSection('report'), 300);
+
+    showToast('Analysis ready for ' + resolveDataset(demoCompany).name);
+  }, 800);
 };
 
 window.runBlkDemo = runBlkDemo;
@@ -1085,15 +1118,17 @@ const checkLiveData = async () => {
   }
 };
 
-applyDataset(defaultDataset);
+// Don't auto-apply dataset - wait for user to click demo or enter a company
+// applyDataset(defaultDataset);
 if (SIMULATED_MODE) {
-  if (dataStatus) dataStatus.innerHTML = 'Live data: <strong>simulated public data</strong>';
+  if (dataStatus) dataStatus.textContent = 'Live data: ready for demo';
 } else {
   checkLiveData();
 }
 runAutoDemoIfRequested();
 
-const pageDemo = document.body?.dataset?.demo;
-if (pageDemo === 'blk') {
-  setTimeout(runBlkDemo, 800);
-}
+// Demo auto-run disabled - user must click "Play demo" button
+// const pageDemo = document.body?.dataset?.demo;
+// if (pageDemo === 'blk') {
+//   setTimeout(runBlkDemo, 800);
+// }
